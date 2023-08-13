@@ -4,8 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-plonky2 = { git = "https://github.com/InternetMaximalism/plonky2", rev = "f99ed9c"}
-plonky2_util = { git = "https://github.com/InternetMaximalism/plonky2", rev = "f99ed9c"}
+# plonky2 = { git = "https://github.com/InternetMaximalism/plonky2", rev = "20c6c15"}
+# plonky2_util = { git = "https://github.com/InternetMaximalism/plonky2", rev = "20c6c15"}
+plonky2 = { path = "../plonky2-intmax/plonky2" }
+plonky2_util = { path = "../plonky2-intmax/util" }
 poseidon-permutation = { git = "https://github.com/polymerdao/poseidon-permutation-rs"}
 anyhow = "1.0.65"
 log = "0.4.17"

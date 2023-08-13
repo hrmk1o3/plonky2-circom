@@ -237,7 +237,7 @@ dependencies = [
  "ciborium",
  "clap",
  "criterion-plot",
- "itertools",
+ "itertools 0.10.5",
  "lazy_static",
  "num-traits",
  "oorandom",
@@ -258,7 +258,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6b50826342786a51a89e2da3a28f1c32b06e387201bc2d19791f622c673706b1"
 dependencies = [
  "cast",
- "itertools",
+ "itertools 0.10.5",
 ]
 
 [[package]]
@@ -384,8 +384,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be4136b2a15dd319360be1c07d9933517ccf0be8f16bf62a3bee4f0d618df427"
 dependencies = [
  "cfg-if",
+ "js-sys",
  "libc",
  "wasi",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -458,6 +460,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "itertools"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1c173a5686ce8bfa551b3563d0c2170bf24ca44da99c7ca4bfdab5418c3fe57"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -525,14 +536,6 @@ name = "log"
 version = "0.4.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b06a4cde4c0f271a446782e3eff8de789548ce57dbc8eca9292c27f4a42004b4"
-
-[[package]]
-name = "maybe_rayon"
-version = "0.1.0"
-source = "git+https://github.com/InternetMaximalism/plonky2?rev=f99ed9c#f99ed9cc3ad62ee2d526f668adfa45fdeafed5a7"
-dependencies = [
- "rayon",
-]
 
 [[package]]
 name = "memchr"
@@ -679,22 +682,24 @@ checksum = "19b17cddbe7ec3f8bc800887bab5e717348c95ea2ca0b1bf0837fb964dc67099"
 
 [[package]]
 name = "plonky2"
-version = "0.1.0"
-source = "git+https://github.com/InternetMaximalism/plonky2?rev=f99ed9c#f99ed9cc3ad62ee2d526f668adfa45fdeafed5a7"
+version = "0.1.3"
 dependencies = [
  "ahash",
  "anyhow",
+ "getrandom",
  "hashbrown",
- "itertools",
+ "hex",
+ "itertools 0.10.5",
  "keccak-hash 0.8.0",
  "log",
- "maybe_rayon",
  "num",
  "plonky2_field",
- "plonky2_util",
+ "plonky2_maybe_rayon",
+ "plonky2_util 0.1.1",
  "rand",
  "rand_chacha",
  "serde",
+ "serde_json",
  "static_assertions",
  "unroll",
 ]
@@ -707,12 +712,12 @@ dependencies = [
  "base64",
  "criterion",
  "env_logger",
- "itertools",
+ "itertools 0.10.5",
  "keccak-hash 0.10.0",
  "log",
  "num",
  "plonky2",
- "plonky2_util",
+ "plonky2_util 0.1.0",
  "poseidon-permutation",
  "serde",
  "serde_json",
@@ -721,13 +726,14 @@ dependencies = [
 
 [[package]]
 name = "plonky2_field"
-version = "0.1.0"
-source = "git+https://github.com/InternetMaximalism/plonky2?rev=f99ed9c#f99ed9cc3ad62ee2d526f668adfa45fdeafed5a7"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d33a655ab5d274f763c292fe7e14577f25e40d9d8607b70ef10b39f8619e60b4"
 dependencies = [
  "anyhow",
- "itertools",
+ "itertools 0.11.0",
  "num",
- "plonky2_util",
+ "plonky2_util 0.1.1",
  "rand",
  "serde",
  "static_assertions",
@@ -735,9 +741,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "plonky2_maybe_rayon"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "194db0cbdd974e92d897cd92b74adb3968dc1b967315eb280357c49a7637994e"
+dependencies = [
+ "rayon",
+]
+
+[[package]]
 name = "plonky2_util"
 version = "0.1.0"
-source = "git+https://github.com/InternetMaximalism/plonky2?rev=f99ed9c#f99ed9cc3ad62ee2d526f668adfa45fdeafed5a7"
+
+[[package]]
+name = "plonky2_util"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5696e2e2a6bb5c48a6e33fb0dd4d20d0a9472784b709964f337f224e99bd6d06"
 
 [[package]]
 name = "plotters"
