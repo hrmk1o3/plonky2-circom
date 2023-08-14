@@ -906,12 +906,11 @@ pub fn generate_circom_verifier<
             || gate_name[0..16].eq("RandomAccessGate")
             || gate_name[0..18].eq("ExponentiationGate")
             || gate_name[0..21].eq("ReducingExtensionGate")
-            || gate_name[0..22].eq("CosetInterpolationGate") // XXX
             || gate_name[0..23].eq("ArithmeticExtensionGate")
             || gate_name[0..26].eq("LowDegreeInterpolationGate")
         {
             //TODO: use num_coeff as a param (same TODO for other gates)
-            let mut code_str: String = "template Arithmetic20() {{".to_string(); // XXX: gate.0.as_ref().export_circom_verification_code();
+            let mut code_str: String = gate.0.as_ref().export_circom_verification_code();
             code_str = code_str.replace("$SET_FILTER;", &*filter_str);
             let v: Vec<&str> = code_str.split(' ').collect();
             let template_name = &v[1][0..v[1].len() - 2];
