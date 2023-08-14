@@ -5,7 +5,7 @@ use plonky2::field::goldilocks_field::GoldilocksField;
 use plonky2::field::types::{Field, Field64, PrimeField64};
 use plonky2::hash::hash_types::HashOut;
 use plonky2::hash::hashing::{compress, hash_n_to_hash_no_pad, PlonkyPermutation};
-use plonky2::hash::poseidon::{PoseidonHash, PoseidonPermutation, SPONGE_RATE, SPONGE_WIDTH, Permuter};
+use plonky2::hash::poseidon::{PoseidonHash, PoseidonPermutation, SPONGE_RATE, SPONGE_WIDTH};
 use plonky2::iop::target::{BoolTarget, Target};
 use plonky2::plonk::circuit_builder::CircuitBuilder;
 use plonky2::plonk::config::{AlgebraicHasher, GenericConfig, Hasher};
