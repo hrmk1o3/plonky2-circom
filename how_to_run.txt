@@ -1,0 +1,58 @@
+    1  sudo apt update
+    2  sudo apt install git curl build-essential libssl-dev pkg-config libgmp3-dev nlohmann-json3-dev llvm-dev libclang-dev clang
+    3  git --help
+    4  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    5  source "$HOME/.cargo/env"
+    6  cargo --version
+    7  rustup default nightly
+    9  cd .ssh
+   11  ssh-keygen -t ed25519 -C "your_email@example.com"
+   13  vim id_ed25519.pub
+   14  eval "$(ssh-agent -s)"
+   24  ssh-add ~/.ssh/id_ed25519
+   30  ssh -T git@github.com
+   31  cd ../ && mkdir tools
+   32  git clone git@github.com:qope/plonky2-circom.git
+   34  cd plonky2-circom
+   38  cargo update -p syn
+   49  cargo clean
+   51  rm Cargo.lock
+   52  cd ../../
+   54  git clone https://github.com/iden3/circom.git
+   55  cd circom/
+   56  cargo build --release
+   57  cargo install --path circom
+   58  circom --help
+   59  cd ../
+   60  git clone https://github.com/nodenv/nodenv.git ~/.nodenv
+   61  sudo ln -vs ~/.nodenv/bin/nodenv /usr/local/bin/nodenv
+   62  cd ~/.nodenv
+   63  src/configure && make -C src || true
+   64  cd ../
+   65  mkdir -p "$(nodenv root)"/plugins
+   182 cargo install zkutil
+   183 zkutil --help
+   66  git clone https://github.com/nodenv/node-build.git "$(nodenv root)"/plugins/node-build
+   67  git clone https://github.com/nodenv/nodenv-aliases.git $(nodenv root)/plugins/nodenv-aliases
+   68  nodenv install 18.17.1
+   69  nodenv global 18
+   75  sudo ln -vs $(nodenv root)/shims/* /usr/local/bin/
+   76  node --version
+   77  cd plonky2-circom/
+   78  ./e2e_test_recursive_proof_circom_verification.sh
+   79  cargo build -r
+   88  cd hardhat
+   89  npm install
+   90  cd ../circom
+   99  npm install
+  100  cd ../../../
+  108  git clone git@github.com:iden3/snarkjs.git
+  136  cd tools/plonky2-circom/circom/e2e_tests
+  138  vim ../circuits/goldilocks_ext.circom # fix "for" statements of GlExtSquare
+  162  cd tools/plonky2-circom/circom/e2e_tests
+  177  circom ../circuits/plonky2.circom --r1cs --sym --wasm -c
+  178  cd plonky2_cpp/
+  180  make -j
+  181  cd ../
+  190  zkutil setup -c plonky2.r1cs
+  200  npx snarkjs calculatewitness plonky2_js/plonky2.wasm ../test/data/proof.json

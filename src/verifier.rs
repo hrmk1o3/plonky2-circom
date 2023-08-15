@@ -34,8 +34,8 @@ pub fn recursive_proof<
     const D: usize,
 >(
     inner_proof: ProofWithPublicInputs<F, InnerC, D>,
-    inner_vd: VerifierOnlyCircuitData<InnerC, D>,
-    inner_cd: CommonCircuitData<F, D>,
+    inner_vd: &VerifierOnlyCircuitData<InnerC, D>,
+    inner_cd: &CommonCircuitData<F, D>,
     config: &CircuitConfig,
     min_degree_bits: Option<usize>,
     print_gate_counts: bool,
@@ -1000,6 +1000,10 @@ mod tests {
 
     use crate::config::PoseidonBN128GoldilocksConfig;
     use anyhow::Result;
+    use intmax_zkp_core::circuits::balance_proof::create_witness;
+    use intmax_zkp_core::circuits::chain_data::ClientSideCircuits;
+    use intmax_zkp_core::common::account::Address;
+    use intmax_zkp_core::common::block::create_sample_blocks_case1;
     use plonky2::field::extension::Extendable;
     use plonky2::fri::reduction_strategies::FriReductionStrategy;
     use plonky2::fri::FriConfig;
@@ -1150,11 +1154,36 @@ mod tests {
 
         type CBn128 = PoseidonBN128GoldilocksConfig;
         let (proof, vd, cd) = dummy_proof::<F, C, D>(&standard_config, 4_000, 0)?;
-        let (proof, vd, cd) =
-            recursive_proof::<F, C, C, D>(proof, vd, cd, &standard_config, None, true, true)?;
+    
+        // let n_senders = 128;
+        // let transfer_tree_height = 10;
+        // let transaction_tree_height = 10;
+        // let deposit_tree_height = 7;
+        // #[cfg(feature = "not-constrain-keccak")]
+        // let log_n_gates = 17;
+        // #[cfg(not(feature = "not-constrain-keccak"))]
+        // let log_n_gates = 18;
+    
+        // let blocks = create_sample_blocks_case1();
+        // let account = Address(3u32.into());
+        // let (latest_proof, _, circuits) = create_witness::<F, C, D>(
+        //     account,
+        //     &blocks,
+        //     n_senders,
+        //     transfer_tree_height,
+        //     transaction_tree_height,
+        //     deposit_tree_height,
+        //     log_n_gates,
+        // );
+        // let proof = latest_proof;
+        // let vd = &circuits.balance_proof.verifier_only;
+        // let cd = &circuits.balance_proof.common;
 
         let (proof, vd, cd) =
-            recursive_proof::<F, CBn128, C, D>(proof, vd, cd, &standard_config, None, true, true)?;
+            recursive_proof::<F, C, C, D>(proof, &vd, &cd, &standard_config, None, true, true)?;
+
+        let (proof, vd, cd) =
+            recursive_proof::<F, CBn128, C, D>(proof, &vd, &cd, &standard_config, None, true, true)?;
 
         let conf = generate_verifier_config(&proof)?;
         let (circom_constants, circom_gates) = generate_circom_verifier(&conf, &cd, &vd)?;

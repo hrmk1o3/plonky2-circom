@@ -6,8 +6,9 @@ edition = "2021"
 [dependencies]
 # plonky2 = { git = "https://github.com/InternetMaximalism/plonky2", rev = "20c6c15"}
 # plonky2_util = { git = "https://github.com/InternetMaximalism/plonky2", rev = "20c6c15"}
-plonky2 = { path = "../plonky2-intmax/plonky2" }
+plonky2 = { path = "../plonky2-intmax/plonky2", features = ["circom_verifier", "solidity_verifier"] }
 plonky2_util = { path = "../plonky2-intmax/util" }
+intmax-zkp-core = { path = "../intmax-zkp-core-new", features = ["circom_verifier", "solidity_verifier"] }
 poseidon-permutation = { git = "https://github.com/polymerdao/poseidon-permutation-rs"}
 anyhow = "1.0.65"
 log = "0.4.17"
@@ -35,3 +36,19 @@ opt-level = 3
 
 [profile.test]
 opt-level = 3
+
+[patch.crates-io]
+# plonky2 = { git = "https://github.com/InternetMaximalism/plonky2", rev = "20c6c15" }
+# plonky2_u32 = { git = "https://github.com/InternetMaximalism/plonky2", rev = "20c6c15" }
+plonky2 = { path = "../plonky2-intmax/plonky2" }
+plonky2_u32 = { path = "../plonky2-intmax/u32" }
+plonky2_field = { path = "../plonky2-intmax/field" }
+plonky2_util = { path = "../plonky2-intmax/util" }
+starky = { path = "../plonky2-intmax/starky" }
+
+[patch."https://github.com/InternetMaximalism/plonky2"]
+plonky2 = { path = "../plonky2-intmax/plonky2" }
+plonky2_u32 = { path = "../plonky2-intmax/u32" }
+plonky2_field = { path = "../plonky2-intmax/field" }
+plonky2_util = { path = "../plonky2-intmax/util" }
+starky = { path = "../plonky2-intmax/starky" }
