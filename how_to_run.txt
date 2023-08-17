@@ -22,6 +22,8 @@
    55  cd circom/
    56  cargo build --release
    57  cargo install --path circom
+  182  cargo install zkutil
+  183  zkutil --help
    58  circom --help
    59  cd ../
    60  git clone https://github.com/nodenv/nodenv.git ~/.nodenv
@@ -30,8 +32,6 @@
    63  src/configure && make -C src || true
    64  cd ../
    65  mkdir -p "$(nodenv root)"/plugins
-   182 cargo install zkutil
-   183 zkutil --help
    66  git clone https://github.com/nodenv/node-build.git "$(nodenv root)"/plugins/node-build
    67  git clone https://github.com/nodenv/nodenv-aliases.git $(nodenv root)/plugins/nodenv-aliases
    68  nodenv install 18.17.1
@@ -49,10 +49,27 @@
   108  git clone git@github.com:iden3/snarkjs.git
   136  cd tools/plonky2-circom/circom/e2e_tests
   138  vim ../circuits/goldilocks_ext.circom # fix "for" statements of GlExtSquare
-  162  cd tools/plonky2-circom/circom/e2e_tests
   177  circom ../circuits/plonky2.circom --r1cs --sym --wasm -c
-  178  cd plonky2_cpp/
+  178  # cd plonky2_cpp
+  180  # make -j
+  181  # cd ../
+  187  node ./plonky2_js/generate_witness.js ./plonky2_js/plonky2.wasm ../test/data/proof.json witness.wtns
+  184  zkutil setup -c plonky2.r1cs
+  190  zkutil prove -c plonky2.r1cs -o ../test/data/proof.json -w witness.wtns
+  200  zkutil verify -i ../test/data/public_inputs.json
+  210  zkutil generate-verifier -v ./hardhat/contracts/Verifier.sol
+
+  420  cd plonky2-circom
+  421  cargo test -r --color=always --package plonky2_circom_verifier --lib verifier::tests::test_recursive_verifier --no-fail-fast -- -Z unstable-options --show-output
+  422  cd circom/e2e_tests
+  424  circom ../circuits/plonky2.circom --r1cs --sym --wasm -c
+  425  # cd plonky2_js
+  426  # node generate_witness.js plonky2.wasm ../../test/data/proof.json ../witness.wtns
+  428  # cd ../
+  178  cd plonky2_cpp
   180  make -j
   181  cd ../
-  190  zkutil setup -c plonky2.r1cs
-  200  npx snarkjs calculatewitness plonky2_js/plonky2.wasm ../test/data/proof.json
+  429  zkutil setup -c plonky2.r1cs
+  434  zkutil prove -c plonky2.r1cs -w witness.wtns
+  441  zkutil generate-verifier -v ./hardhat/contracts/Verifier.sol
+  438  zkutil verify

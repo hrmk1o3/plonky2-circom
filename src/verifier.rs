@@ -1153,7 +1153,7 @@ mod tests {
         let standard_config = CircuitConfig::standard_recursion_config();
 
         type CBn128 = PoseidonBN128GoldilocksConfig;
-        let (proof, vd, cd) = dummy_proof::<F, C, D>(&standard_config, 4_000, 0)?;
+        let (proof, vd, cd) = dummy_proof::<F, C, D>(&standard_config, 4_000, 4)?;
     
         // let n_senders = 128;
         // let transfer_tree_height = 10;
