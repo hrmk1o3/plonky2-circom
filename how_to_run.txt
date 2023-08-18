@@ -69,6 +69,7 @@
   178  cd plonky2_cpp
   180  make -j
   181  cd ../
+  182  ./plonky2_cpp/plonky2 input.json witness.wtns
   429  zkutil setup -c plonky2.r1cs
   434  zkutil prove -c plonky2.r1cs -w witness.wtns
   441  zkutil generate-verifier -v ./hardhat/contracts/Verifier.sol
