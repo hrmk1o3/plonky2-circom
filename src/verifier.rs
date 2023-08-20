@@ -29,7 +29,7 @@ pub fn encode_hex(bytes: &[u8]) -> String {
 
 pub fn recursive_proof<
     F: RichField + Extendable<D>,
-    OuterC: GenericConfig<D, F = F>,
+    C: GenericConfig<D, F = F>,
     InnerC: GenericConfig<D, F = F>,
     const D: usize,
 >(
@@ -41,13 +41,13 @@ pub fn recursive_proof<
     print_gate_counts: bool,
     print_timing: bool,
 ) -> Result<(
-    ProofWithPublicInputs<F, OuterC, D>,
-    VerifierOnlyCircuitData<OuterC, D>,
+    ProofWithPublicInputs<F, C, D>,
+    VerifierOnlyCircuitData<C, D>,
     CommonCircuitData<F, D>,
 )>
 where
     InnerC::Hasher: AlgebraicHasher<F>,
-    [(); OuterC::Hasher::HASH_SIZE]:,
+    [(); C::Hasher::HASH_SIZE]:,
 {
     let mut builder = CircuitBuilder::<F, D>::new(config.clone());
     let mut pw = PartialWitness::new();
@@ -84,7 +84,7 @@ where
         }
     }
 
-    let data = builder.build::<OuterC>();
+    let data = builder.build::<C>();
 
     let mut timing = TimingTree::new("prove", Level::Debug);
     let proof = prove(&data.prover_only, &data.common, pw, &mut timing)?;

@@ -4,12 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-# plonky2 = { git = "https://github.com/InternetMaximalism/plonky2", rev = "20c6c15"}
-# plonky2_util = { git = "https://github.com/InternetMaximalism/plonky2", rev = "20c6c15"}
-plonky2 = { path = "../plonky2-intmax/plonky2", features = ["circom_verifier", "solidity_verifier"] }
-plonky2_util = { path = "../plonky2-intmax/util" }
+plonky2 = { git = "https://github.com/InternetMaximalism/plonky2", rev = "c8ee171", features = ["circom_verifier", "solidity_verifier"] }
+plonky2_util = { git = "https://github.com/InternetMaximalism/plonky2", rev = "c8ee171" }
 intmax-zkp-core = { path = "../intmax-zkp-core-new", features = ["circom_verifier", "solidity_verifier"] }
-poseidon-permutation = { git = "https://github.com/polymerdao/poseidon-permutation-rs"}
+poseidon-permutation = { git = "https://github.com/polymerdao/poseidon-permutation-rs" }
 anyhow = "1.0.65"
 log = "0.4.17"
 env_logger = "0.9.1"
