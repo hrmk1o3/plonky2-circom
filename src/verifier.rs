@@ -1002,6 +1002,7 @@ mod tests {
     use anyhow::Result;
     use intmax_zkp_core::circuits::balance_proof::create_witness;
     use intmax_zkp_core::circuits::chain_data::ClientSideCircuits;
+    use intmax_zkp_core::circuits::public_inputs::TotalAmountProofPublicInputsTarget;
     use intmax_zkp_core::common::account::Address;
     use intmax_zkp_core::common::block::create_sample_blocks_case1;
     use plonky2::field::extension::Extendable;
@@ -1012,6 +1013,8 @@ mod tests {
     use plonky2::plonk::circuit_data::{CommonCircuitData, VerifierOnlyCircuitData};
     use plonky2::plonk::config::{Hasher, PoseidonGoldilocksConfig};
     use plonky2::plonk::proof::ProofWithPublicInputs;
+    use plonky2::plonk::prover::prove;
+    use plonky2::util::timing::TimingTree;
     use plonky2::{
         gates::noop::NoopGate,
         iop::witness::PartialWitness,
@@ -1021,7 +1024,7 @@ mod tests {
     };
 
     use crate::verifier::{
-        generate_circom_verifier, generate_proof_base64, generate_verifier_config, recursive_proof,
+        generate_circom_verifier, generate_proof_base64, generate_verifier_config,
     };
 
     /// Creates a dummy proof which should have roughly `num_dummy_gates` gates.
@@ -1150,43 +1153,81 @@ mod tests {
         const D: usize = 2;
         type C = PoseidonGoldilocksConfig;
         type F = <C as GenericConfig<D>>::F;
-        let standard_config = CircuitConfig::standard_recursion_config();
+        let config = CircuitConfig::standard_recursion_config();
 
         type CBn128 = PoseidonBN128GoldilocksConfig;
-        let (proof, vd, cd) = dummy_proof::<F, C, D>(&standard_config, 4_000, 4)?;
-    
-        // let n_senders = 128;
-        // let transfer_tree_height = 10;
-        // let transaction_tree_height = 10;
-        // let deposit_tree_height = 7;
-        // #[cfg(feature = "not-constrain-keccak")]
-        // let log_n_gates = 17;
-        // #[cfg(not(feature = "not-constrain-keccak"))]
-        // let log_n_gates = 18;
-    
-        // let blocks = create_sample_blocks_case1();
-        // let account = Address(3u32.into());
-        // let (latest_proof, _, circuits) = create_witness::<F, C, D>(
-        //     account,
-        //     &blocks,
-        //     n_senders,
-        //     transfer_tree_height,
-        //     transaction_tree_height,
-        //     deposit_tree_height,
-        //     log_n_gates,
-        // );
-        // let proof = latest_proof;
-        // let vd = &circuits.balance_proof.verifier_only;
-        // let cd = &circuits.balance_proof.common;
+        // let (proof, vd, cd) = dummy_proof::<F, C, D>(&standard_config, 4_000, 4)?;
+        // let (proof, vd, cd) =
+        //     recursive_proof::<F, C, C, D>(proof, vd, cd, &standard_config, None, true, true)?;
+        // let (proof, vd, cd) =
+        //     recursive_proof::<F, CBn128, C, D>(proof, &vd, &cd, &standard_config, None, true, true)?;
 
-        let (proof, vd, cd) =
-            recursive_proof::<F, C, C, D>(proof, &vd, &cd, &standard_config, None, true, true)?;
+        let n_senders = 2;
+        let transfer_tree_height = 4;
+        let transaction_tree_height = 1;
+        let deposit_tree_height = 1;
+        #[cfg(feature = "not-constrain-keccak")]
+        let log_n_gates = 13;
+        #[cfg(not(feature = "not-constrain-keccak"))]
+        let log_n_gates = 16;
 
-        let (proof, vd, cd) =
-            recursive_proof::<F, CBn128, C, D>(proof, &vd, &cd, &standard_config, None, true, true)?;
+        let blocks = create_sample_blocks_case1();
+        let account = Address(3u32.into());
+        let circuits = ClientSideCircuits::new(
+            n_senders,
+            transfer_tree_height,
+            transaction_tree_height,
+            deposit_tree_height,
+            log_n_gates,
+        );
+        let (proof, _) = create_witness::<F, C, D>(account, &blocks, &circuits);
+        dbg!(proof.public_inputs.len());
 
+        // first recursion
+        let mut builder = CircuitBuilder::<F, D>::new(config.clone());
+        let pt = circuits.balance_proof.add_recursion_proof(&mut builder);
+        let public_inputs = TotalAmountProofPublicInputsTarget::from_vec(&pt.public_inputs);
+        builder.register_public_inputs(&public_inputs.to_vec());
+        let circuit_data = builder.build::<C>();
+
+        let mut pw = PartialWitness::new();
+        pw.set_proof_with_pis_target(&pt, &proof);
+
+        let mut timing = TimingTree::new("prove", log::Level::Debug);
+        let proof = prove(
+            &circuit_data.prover_only,
+            &circuit_data.common,
+            pw,
+            &mut timing,
+        )?;
+        timing.print();
+
+        // second recursion
+        let mut builder = CircuitBuilder::<F, D>::new(config.clone());
+        let pt = builder.add_virtual_proof_with_pis(&circuit_data.common);
+        let vd_target = builder.constant_verifier_data(&circuit_data.verifier_only);
+        builder.verify_proof::<C>(&pt, &vd_target, &circuit_data.common);
+        builder.register_public_inputs(&pt.public_inputs);
+        let circuit_data = builder.build::<CBn128>();
+
+        let mut pw = PartialWitness::new();
+        pw.set_proof_with_pis_target(&pt, &proof);
+
+        let mut timing = TimingTree::new("prove", log::Level::Debug);
+        let proof = prove(
+            &circuit_data.prover_only,
+            &circuit_data.common,
+            pw,
+            &mut timing,
+        )?;
+        timing.print();
+
+        let cd = &circuit_data.common;
+        let vd = &circuit_data.verifier_only;
+
+        // Generate circom verifier
         let conf = generate_verifier_config(&proof)?;
-        let (circom_constants, circom_gates) = generate_circom_verifier(&conf, &cd, &vd)?;
+        let (circom_constants, circom_gates) = generate_circom_verifier(&conf, cd, vd)?;
 
         let mut circom_file = File::create("./circom/circuits/constants.circom")?;
         circom_file.write_all(circom_constants.as_bytes())?;
