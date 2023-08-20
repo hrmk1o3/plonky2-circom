@@ -1,6 +1,7 @@
 import {ethers} from "hardhat";
 import "@nomiclabs/hardhat-etherscan";
-import {assert, expect} from "chai";
+import {expect} from "chai";
+import fs from 'fs';
 
 describe("Groth16", function () {
     it("Should return true when proof is correct", async function () {
@@ -8,21 +9,14 @@ describe("Groth16", function () {
         const verifier = await verifierFactory.deploy();
         await verifier.deployed();
 
-        const fs = require("fs");
-        let text = fs.readFileSync("./test/public.txt").toString();
-        text = text.replace(/\s+/g, '');
-        text = text.replace(/\[+/g, '');
-        text = text.replace(/]+/g, '');
-        text = text.replace(/"+/g, '');
-        const p = text.split(",");
-        let public_inputs = [];
-        for (let i = 0; i < p.length - 8; i++) {
-            public_inputs.push(p[8 + i]);
-        }
+        const publicJson = fs.readFileSync("../public.json").toString();
+        const publicInputs: any[] = JSON.parse(publicJson);
+        const proofJson = fs.readFileSync("../proof.json").toString();
+        const proof = JSON.parse(proofJson);
+
         expect(await verifier.verifyProof(
-            [p[0], p[1]],
-            [[p[2], p[3]], [p[4], p[5]]],
-            [p[6], p[7]], public_inputs
+            "0x" + proof.proof,
+            publicInputs
         )).to.equal(true);
     });
 });
