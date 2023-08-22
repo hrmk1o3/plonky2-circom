@@ -57,7 +57,7 @@ impl PlonkyPermutation<F> for PoseidonBN128Permutation<F> {
     }
 
     fn permute(&mut self) {
-        // self.state = F::permute(self.state);
+        // self.state = <F as Poseidon>::poseidon(self.state);
         let input = self.state;
         let state = input.map(|v| v.to_canonical_u64());
         let state = unsafe {
@@ -70,10 +70,6 @@ impl PlonkyPermutation<F> for PoseidonBN128Permutation<F> {
                 h.r0, h.r1, h.r2, h.r3, h.r4, h.r5, h.r6, h.r7, h.r8, h.r9, h.r10, h.r11,
             ]
         };
-
-        for v in state {
-            assert!(v < F::ORDER);
-        }
 
         self.state =
             state.map(|r| F::from_canonical_u64(if r >= F::ORDER { r - F::ORDER } else { r }));
